@@ -291,7 +291,7 @@ const CMD = {
 /* ---------- Data: kombinasi tag Google Flow ---------- */
 const FLOW = {
   1: ["Produk premium", "/ultraphotorealistic /floatingad /heroProduct /premiumcommercial /cinematiclighting /rimlighting /slowzoom /realisticPhysics /8kdetail"],
-  2: ["Produk jatuh lalu terapung", "/ultraphotorealistic /dynamicmotion /productReveal /productlevitation /slowmotion /particleburst /cinematiclighting /orbitcamera /realisticPhysics"],
+  2: ["Produk jatuh kemudian terapung", "/ultraphotorealistic /dynamicmotion /productReveal /productlevitation /slowmotion /particleburst /cinematiclighting /orbitcamera /realisticPhysics"],
   3: ["Gadget", "/ultraphotorealistic /premiumproductshot /macroshot /threequarterview /reflectioncontrol /rimlighting /orbitcamera /slowzoom /luxurycommercial /8kdetail"],
   4: ["Kosmetik", "/ultraphotorealistic /luxuryadvertising /floatingproduct /macroshot /softlighting /glowReveal /slowmotion /particleburst /cinematiccommercial"],
   5: ["Makanan & minuman", "/ultraphotorealistic /foodcommercial /macroshot /splashReveal /slowmotion /realisticPhysics /dramaticlighting /closeup /heroProduct"],
@@ -355,7 +355,7 @@ const KAT = {
     lock: "Keep exact garment design, exact color, exact print and logo placement, exact fabric texture and fit.",
     lima: { hook: ["fashion_street", "social_portrait"], detail: ["fashion_editorial"], demo: ["fashion_lifestyle", "model_product"], bukti: ["fashion_catalog", "fashion_studio"], cta: ["fashion_editorial", "social_portrait"] },
     latar: ["jalan bandar Kuala Lumpur waktu senja", "kafe hipster", "studio putih", "taman bandar waktu pagi"],
-    papan: "model walk in the street city/angle camera cinematic/action model international/shot camera macro detail produk fabric and stitching/sunlight views/drone views",
+    papan: "model walk in the street city/angle camera cinematic/action model international/macro shot of product details, fabric and stitching/sunlight views/drone views",
     satuKod: "/FPV Flythrough along the street",
     asmr: "/adcreative/asmr/product/luxury macro shot/unboxing/fabric rustling/soft folding/slow motion/cinematic commercial/9:16",
     nota: "Model dan suasana jalanan bantu penonton bayangkan cara memakainya. /fashion_catalog menjaga warna dan saiz kekal tepat untuk babak bukti.",
@@ -366,7 +366,7 @@ const KAT = {
     lock: "Keep exact shoe shape, exact sole design, exact logo, exact colorway and materials.",
     lima: { hook: ["product_floating", "fashion_street", "social_portrait"], detail: ["product_hero", "product_luxury"], demo: ["model_product", "fashion_lifestyle"], bukti: ["product_360", "ecommerce"], cta: ["cinematic_ad", "social_portrait"] },
     latar: ["jalan bandar basah selepas hujan", "trek larian taman", "gelanggang bola keranjang", "studio gelap"],
-    papan: "model walk and run in the street city/low angle tracking shot/shot camera macro detail produk sole material and stitching/wet street reflection/drone views/hero shot product",
+    papan: "model walk and run in the street city/low angle tracking shot/macro shot of product details, sole, material and stitching/wet street reflection/drone views/hero shot product",
     satuKod: "/FPV Chase Shot",
     asmr: "/adcreative/asmr/product/luxury macro shot/unboxing shoe box/lace pulling/sole tapping/slow motion/cinematic commercial/9:16",
     nota: "Kasut paling sesuai dengan FPV dan speed ramp. Tunjuk tapak, bahan dan jahitan dari dekat dalam babak detail.",
@@ -399,10 +399,10 @@ const KAT_ORDER = ["makanan", "minuman", "gadget", "barang", "fashion", "kasut",
 
 /* ---------- Jenis video (aliran kerja) ---------- */
 const ALIRAN = {
-  pantas: { label: "Iklan 30 saat", ringkas: "Hook, masalah, CTA. Untuk pemula.", sumber: "Materi pemula" },
-  premium: { label: "Iklan premium", ringkas: "Kolaj produk + storyboard, 3 klip.", sumber: "Materi premium 1 & 2" },
-  lima: { label: "5 babak", ringkas: "5 gambar dijadikan video 15–30 saat.", sumber: "Ebook Kode Visual" },
-  asmr: { label: "ASMR", ringkas: "Tanpa muzik dan narasi.", sumber: "ASMR Prompt Kit" }
+  pantas: { label: "Iklan 30 saat", ringkas: "Hook, masalah, CTA. Untuk pemula.", sumber: "Modul pemula" },
+  premium: { label: "Iklan premium", ringkas: "Kolaj produk + storyboard, 3 klip.", sumber: "Modul premium 1 & 2" },
+  lima: { label: "5 babak", ringkas: "5 gambar dijadikan video 15–30 saat.", sumber: "Ebook Kod Visual" },
+  asmr: { label: "ASMR", ringkas: "Tanpa muzik dan suara latar.", sumber: "Kit Prompt ASMR" }
 };
 
 const MOTION = {
@@ -503,16 +503,16 @@ function buildPantas(P) {
     timeline: [["Hook", "0–10 s", "hook"], ["Masalah & penyelesaian", "10–20 s", ""], ["CTA", "20–30 s", "cta"]],
     steps: [
       { tool: "gpt", title: "Buka ChatGPT dan muat naik foto produk", text: "Mulakan chat baru. Muat naik screenshot halaman produk atau foto produk yang jelas, tapi jangan tekan hantar dulu.", tip: "Foto terang dan tidak kabur membantu label dan logo kekal tepat." },
-      { tool: "gpt", title: "Jana storyboard 6 panel", text: "Tampal prompt ini bersama foto tadi, kemudian hantar. Simpan gambar storyboard yang terhasil.", prompts: [["Prompt gambar storyboard", `/adcreative/storyboard 6 panel image/rasio 9:16\n\n${productLines(P)}`]] },
-      { tool: "gpt", title: "Minta ChatGPT tulis prompt video 3 babak", text: "Dalam chat yang sama, tampal prompt ini. ChatGPT akan tulis prompt video dan narasi untuk setiap babak berdasarkan storyboard tadi.", prompts: [["Prompt video", `Buatkan prompt video dengan kod kunci produk sesuai dengan storyboard di atas dengan /durasi 30 saat /3 babak /setiap babak 10 saat /iklan komersial /narasi /hook /problem solve /cta
+      { tool: "gpt", title: "Jana storyboard 6 panel", text: "Tampal prompt ini bersama foto tadi, kemudian hantar. Simpan gambar storyboard yang terhasil.", prompts: [["Prompt gambar storyboard", `/adcreative/storyboard 6 panel/gambar/nisbah 9:16\n\n${productLines(P)}`]] },
+      { tool: "gpt", title: "Minta ChatGPT tulis prompt video 3 babak", text: "Dalam chat yang sama, tampal prompt ini. ChatGPT akan tulis prompt video dan skrip suara latar untuk setiap babak berdasarkan storyboard tadi.", prompts: [["Prompt video", `Hasilkan prompt video dengan kod kunci produk berdasarkan storyboard di atas: /tempoh 30 saat /3 babak /setiap babak 10 saat /iklan komersial /suara latar /hook /masalah & penyelesaian /cta
 
 Produk: ${nm(P)}${P.butiran ? " (" + P.butiran + ")" : ""}
 ${P.masalah ? "Masalah pembeli: " + P.masalah + "\n" : ""}${P.kelebihan ? "Kelebihan utama: " + P.kelebihan + "\n" : ""}${P.promo ? "Tawaran: " + P.promo + "\n" : ""}
 BABAK 1 – 10 saat – HOOK
-BABAK 2 – 10 saat – PROBLEM & SOLVE
+BABAK 2 – 10 saat – MASALAH & PENYELESAIAN
 BABAK 3 – 10 saat – CTA (ajak tekan beg kuning)
 
-Tulis narasi dalam Bahasa Melayu santai. Masukkan kod visual ini dalam prompt setiap babak:
+Tulis skrip suara latar dalam Bahasa Melayu santai. Masukkan kod visual ini dalam prompt setiap babak:
 Babak 1: ${t1}
 Babak 2: ${t2}
 Babak 3: ${t3}
@@ -538,8 +538,8 @@ function buildPremium(P) {
     timeline: [["Klip 1 · Orbit", "± 8 s", "hook"], ["Klip 2 · Kamera", "± 8 s", ""], ["Klip 3 · Hero + CTA", "± 8 s", "cta"]],
     steps: [
       { tool: "gpt", title: "Buka ChatGPT dan muat naik rujukan", text: P.model ? "Mulakan chat baru. Muat naik foto produk dan foto model sebagai rujukan." : "Mulakan chat baru. Muat naik foto produk yang jelas. Klik ikon + / lampiran, tunggu foto muncul, jangan hantar dulu.", tip: "Guna foto yang tajam supaya produk dan model kekal konsisten." },
-      { tool: "gpt", title: "Gambar 1: kolaj detail produk", text: "Hasilnya satu kolaj menegak: hero shot di atas, beberapa sudut produk, dan detail bahan. Simpan sebagai Gambar 1.", prompts: [["Prompt Gambar 1", `/adcreative detail produk\n\n${productLines(P)}`]] },
-      { tool: "gpt", title: "Gambar 2: storyboard 6 panel", text: "Dalam chat yang sama, tampal prompt storyboard ini. Simpan hasilnya sebagai Gambar 2.", prompts: [["Prompt Gambar 2", `/storyboard 6 panel/iklan komersial/${K.papan}/angle camera cinematic/rasio 9:16${P.model ? "/model promotion" : ""}\n\n${productLines(P)}`]] },
+      { tool: "gpt", title: "Gambar 1: kolaj perincian produk", text: "Hasilnya satu kolaj menegak: hero shot di atas, beberapa sudut produk, dan perincian bahan. Simpan sebagai Gambar 1.", prompts: [["Prompt Gambar 1", `/adcreative perincian produk\n\n${productLines(P)}`]] },
+      { tool: "gpt", title: "Gambar 2: storyboard 6 panel", text: "Dalam chat yang sama, tampal prompt storyboard ini. Simpan hasilnya sebagai Gambar 2.", prompts: [["Prompt Gambar 2", `/storyboard 6 panel/iklan komersial/${K.papan}/angle camera cinematic/nisbah 9:16${P.model ? "/model promotion" : ""}\n\n${productLines(P)}`]] },
       { tool: "flow", title: "Buka Google Flow, muat naik Gambar 1 dan 2", text: "Buat projek baru. Pastikan kedua-dua gambar sudah masuk sebelum tulis prompt video." },
       { tool: "flow", title: "Jana 3 klip, satu set kod bagi setiap klip", text: "Tampal satu set sahaja, tekan generate, kemudian ulang dengan set seterusnya. Jangan gabungkan set dalam satu prompt.", prompts: [
         ["Klip 1 · Set B (orbit & terapung)", `${setB}\n${desc}`],
@@ -562,7 +562,7 @@ function buildLima(P) {
       { tool: "gpt", title: "Buka ChatGPT dan muat naik foto produk", text: "Satu chat untuk satu produk. Semua 5 gambar guna foto rujukan yang sama.", tip: "Leonardo.Ai juga boleh guna prompt yang sama." },
       { tool: "gpt", title: "Jana 5 gambar, satu bagi setiap babak", text: "Tampal satu prompt, tunggu gambar siap, kemudian tampal prompt seterusnya. Semua gambar 9:16 dengan palet warna dan PRODUCT LOCK yang sama.", prompts: images, tip: "<b>Satu kesan utama bagi setiap gambar</b> (percikan, asap atau partikel). Jangan tindih banyak kesan." },
       { tool: "flow", title: "Hidupkan setiap gambar jadi klip 3–5 saat", text: "Guna Google Flow atau alat image-to-video pilihan anda. Muat naik gambar babak dan tampal prompt gerak yang sepadan.", prompts: motions },
-      { tool: "gpt", title: "Tulis skrip voice over", text: "Minta ChatGPT tulis narasi yang ikut 5 babak.", prompts: [["Prompt skrip", `Tulis skrip voice over 30 saat dalam Bahasa Melayu santai untuk video TikTok ${nm(P)}, ikut 5 babak:
+      { tool: "gpt", title: "Tulis skrip voice over", text: "Minta ChatGPT tulis skrip suara latar yang ikut 5 babak.", prompts: [["Prompt skrip", `Tulis skrip voice over 30 saat dalam Bahasa Melayu santai untuk video TikTok ${nm(P)}, ikut 5 babak:
 1. Hook (0–3 saat): satu ayat yang hentikan skrol.
 2. Detail (3–8 saat): tekstur dan kualiti produk.
 3. Demo (8–18 saat): produk dipakai atau dinikmati.
@@ -584,7 +584,7 @@ function buildAsmr(P) {
       { tool: "gpt", title: "Buka ChatGPT dan muat naik foto produk", text: "Mulakan chat baru dengan foto produk yang jelas." },
       { tool: "gpt", title: "Jana storyboard ASMR 6 panel", text: "Hasilnya 6 panel: makro tekstur, tangan, aksi utama, super makro, slow motion dan hero shot.", prompts: [["Prompt storyboard ASMR", `/adcreative/storyboard/6panel/ASMR cinematic commercial/extreme macro detail/slow motion/satisfying action/realistic texture/natural lighting/close-up hands/product hero shot/immersive sound design/no music/no voiceover/vertical 9:16\n\n${productLines(P)}`]] },
       { tool: "flow", title: "Jana video setiap panel di Google Flow", text: "Muat naik storyboard sebagai rujukan, kemudian generate satu panel pada satu masa.", prompts: panels },
-      { tool: "cap", title: "Kemas di CapCut", list: ["Cantum 6 klip mengikut turutan panel.", "Tiada muzik dan tiada narasi. Biar bunyi ASMR yang menonjol.", "Gerakan perlahan dan halus. Akhiri dengan hero shot.", "Teks CTA kecil sahaja di hujung."] },
+      { tool: "cap", title: "Kemas di CapCut", list: ["Cantum 6 klip mengikut turutan panel.", "Tiada muzik dan tiada suara latar. Biar bunyi ASMR yang menonjol.", "Gerakan perlahan dan halus. Akhiri dengan hero shot.", "Teks CTA kecil sahaja di hujung."] },
       captionStep(P)
     ]
   };
@@ -714,25 +714,25 @@ $("#cari").addEventListener("input", e => renderKamus(e.target.value.trim()));
 const BONUS = [
   { t: "Bina tool generator sendiri di Gemini", s: "ChatGPT tulis prompt, Gemini Canvas jadikan app storyboard.", body: [
     ["p", "1. Buka ChatGPT dan tampal prompt di bawah. Tukar nama tool jika mahu."],
-    ["prompt", "Prompt ChatGPT", "Buatkan prompt untuk membina tool generator di Gemini, untuk menjana gambar bagi tujuan afiliat. Lengkap dengan analisis produk, pemilihan model, dan naratif yang sesuai dengan jenis produk (hook, problem-solve dan CTA). Nama tool generator: AI Affiliate Storyboard Generator"],
+    ["prompt", "Prompt ChatGPT", "Sediakan prompt untuk membina tool generator di Gemini, untuk menjana gambar bagi tujuan afiliat. Lengkap dengan analisis produk, pemilihan model, dan naratif yang sesuai dengan jenis produk (hook, problem-solve dan CTA). Nama tool generator: AI Affiliate Storyboard Generator"],
     ["p", "2. Salin semua prompt yang ChatGPT hasilkan. 3. Buka Gemini, hidupkan mod Canvas, kemudian tampal. Gemini akan bina app dengan ciri ini:"],
-    ["ul", ["Product Analyzer: analisis gambar JPG/PNG/WEBP (jenama, warna, bentuk, bahan, bungkusan).", "Tempoh 15 / 20 / 30 / 45 / 60 saat, gaya TikTok Affiliate, UGC atau Cinematic.", "Master Lock supaya watak dan produk sama dalam setiap babak.", "Visual 9:16 dengan butang Generate, Regenerate, Edit Prompt dan Generate All.", "Prompt video untuk Veo, Kling dan Runway.", "Narasi, kapsyen TikTok, CTA beg kuning, eksport PDF / TXT / JSON."]],
+    ["ul", ["Product Analyzer: analisis gambar JPG/PNG/WEBP (jenama, warna, bentuk, bahan, bungkusan).", "Tempoh 15 / 20 / 30 / 45 / 60 saat, gaya TikTok Affiliate, UGC atau Cinematic.", "Master Lock supaya watak dan produk sama dalam setiap babak.", "Visual 9:16 dengan butang Generate, Regenerate, Edit Prompt dan Generate All.", "Prompt video untuk Veo, Kling dan Runway.", "Skrip suara latar, kapsyen TikTok, CTA beg kuning, eksport PDF / TXT / JSON."]],
     ["p", "Struktur storyboard yang diikut: Hook, Problem, Solution, Demonstration, Benefit, CTA."]
   ]},
   { t: "Animasi gaya Disney Pixar", s: "3 prompt: idea cerita, master karakter, prompt setiap babak.", body: [
-    ["prompt", "Prompt 1 · Idea cerita", "Kamu adalah seorang animator handal. Berikan 5 idea buku cerita tentang [tema pilihan] dengan gaya kartun 3D ala Disney Pixar yang realistik."],
-    ["prompt", "Prompt 2 · Master karakter", "Buatkan prompt master karakter [penerangan karakter yang diingini] secara terperinci, sempurna dan konsisten dalam semua babak, dengan gaya kartun 3D ala Disney yang realistik."],
-    ["prompt", "Prompt 3 · Setiap babak", "Kembangkan idea nombor [..] menjadi kandungan pendidikan untuk [..] babak. Buatkan visualnya dalam bentuk prompt text-to-image dan image-to-video bergaya kartun 3D ala Disney Pixar yang realistik, dengan master prompt karakter. Prompt wajib ikut arahan visual dan narasi setiap babak, setiap satu berdurasi 6 saat."],
+    ["prompt", "Prompt 1 · Idea cerita", "Anda seorang animator yang mahir. Berikan 5 idea buku cerita tentang [tema pilihan] dengan gaya kartun 3D ala Disney Pixar yang realistik."],
+    ["prompt", "Prompt 2 · Master karakter", "Sediakan prompt master karakter [penerangan karakter yang diingini] secara terperinci, sempurna dan konsisten dalam semua babak, dengan gaya kartun 3D ala Disney yang realistik."],
+    ["prompt", "Prompt 3 · Setiap babak", "Kembangkan idea nombor [..] menjadi kandungan pendidikan untuk [..] babak. Hasilkan visualnya dalam bentuk prompt text-to-image dan image-to-video bergaya kartun 3D ala Disney Pixar yang realistik, dengan master prompt karakter. Prompt wajib ikut arahan visual dan skrip setiap babak. Setiap babak 6 saat."],
     ["p", "Setiap prompt babak mesti ada: master karakter di awal, pakaian karakter, objek, subjek, tempat, pencahayaan, suasana dan bunyi, serta sudut kamera. Satu babak untuk satu aksi sahaja. Jangan ubah penerangan karakter di tengah jalan."]
   ]},
   { t: "Animasi claymation", s: "Topik, skrip storytelling, prompt visual gaya tanah liat.", body: [
-    ["prompt", "Langkah 1 · 5 topik", "BUATKAN 5 TOPIK KANDUNGAN TENTANG (...isi yang anda mahu...) YANG JARANG ORANG TAHU, YANG SESUAI DIBINCANGKAN DENGAN GAYA CLAY ANIMATION."],
-    ["prompt", "Langkah 2 · Skrip", "Topik: (tajuk pilihan anda)\nBUATKAN SKRIP VIDEO TIKTOK/SHORT BERGAYA STORYTELLING PENDIDIKAN, DENGAN GAYA CLAY ANIMATION. GUNAKAN BAHASA RINGAN DAN SOPAN DENGAN VISUAL YANG TERPERINCI.\n\nStruktur: 1. Hook 2. Pengenalan topik 3. Penjelasan 1: asal usul / fakta asas 4. Penjelasan 2: fakta paling menarik 5. Fakta unik / sisi lain 6. Pendidikan 7. Ajakan bertindak\n\nSertakan arahan visual untuk setiap ayat."],
+    ["prompt", "Langkah 1 · 5 topik", "SENARAIKAN 5 TOPIK KANDUNGAN TENTANG (...isi yang anda mahu...) YANG JARANG ORANG TAHU, YANG SESUAI DIBINCANGKAN DENGAN GAYA CLAY ANIMATION."],
+    ["prompt", "Langkah 2 · Skrip", "Topik: (tajuk pilihan anda)\nTULISKAN SKRIP VIDEO TIKTOK/SHORT BERGAYA STORYTELLING PENDIDIKAN, DENGAN GAYA CLAY ANIMATION. GUNAKAN BAHASA RINGAN DAN SOPAN DENGAN VISUAL YANG TERPERINCI.\n\nStruktur: 1. Hook 2. Pengenalan topik 3. Penjelasan 1: asal usul / fakta asas 4. Penjelasan 2: fakta paling menarik 5. Fakta unik / sisi lain 6. Pendidikan 7. Ajakan bertindak\n\nSertakan arahan visual untuk setiap ayat."],
     ["prompt", "Langkah 3 · Master prompt (letak di awal setiap prompt gambar)", "soft 3D clay animation, handcrafted texture, vibrant full-color palette, crowded and dramatic scene. Proportional human characters with expressive faces, smooth clay details with subtle fingerprint. Busy and colorful environment, modern cinematic lighting with soft contrast and depth of field. Dynamic atmosphere, high-quality visual style."],
     ["p", "Minta ChatGPT buat 2 visual bagi setiap bahagian skrip, maksimum 800 aksara setiap prompt. Hantar prompt satu demi satu. Kesan tambahan: kilauan lembut, neon lembut, partikel cahaya, sparkle, palet warna terang."]
   ]},
   { t: "Video tutorial asal", s: "Pautan YouTube dari folder modul.", body: [
-    ["links", [["Tutorial iklan 30 saat (ChatGPT + Flow)", "https://youtu.be/T5q5hD-Zybo"], ["Materi kelas: membuat video", "https://youtu.be/bddTnosYAf8"]]]
+    ["links", [["Tutorial iklan 30 saat (ChatGPT + Flow)", "https://youtu.be/T5q5hD-Zybo"], ["Kelas: cara membuat video", "https://youtu.be/bddTnosYAf8"]]]
   ]}
 ];
 function renderBonus() {
