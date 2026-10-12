@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio Prompt Afiliat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: borang tetap di kiri (atas di telefon), langkah kerja bernombor di kanan, seperti helaian arahan penggambaran */
+:root {
+  --bg: #EDEFF3;
+  --surface: #FFFFFF;
+  --surface-2: #F5F6F9;
+  --ink: #14161B;
+  --muted: #586070;
+  --line: #D7DBE3;
+  --accent: #D9481A;
+  --accent-ink: #FFFFFF;
+  --bag: #F2B705;
+  --bag-ink: #2A2100;
+  --gpt: #0B7F61;
+  --flow: #2C5ED6;
+  --cap: #3A3F4B;
+  --code: #F2F3F6;
+  --ok: #1B8A4B;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1116; --surface: #171A21; --surface-2: #1E222A; --ink: #ECEEF2; --muted: #9AA1AF;
+    --line: #2B303A; --accent: #FF6A35; --accent-ink: #1A0902; --bag: #F5C431; --bag-ink: #2A2100;
+    --gpt: #3CC79E; --flow: #86A5FF; --cap: #C9CDD6; --code: #12151B; --ok: #43C77F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1116; --surface: #171A21; --surface-2: #1E222A; --ink: #ECEEF2; --muted: #9AA1AF;
+  --line: #2B303A; --accent: #FF6A35; --accent-ink: #1A0902; --bag: #F5C431; --bag-ink: #2A2100;
+  --gpt: #3CC79E; --flow: #86A5FF; --cap: #C9CDD6; --code: #12151B; --ok: #43C77F;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 56px; }
+
+/* Header */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; padding-block: 8px 18px; border-bottom: 2px solid var(--ink); }
+.brand h1 { font: 800 clamp(28px, 4.4vw, 44px)/1 var(--display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+.brand h1 .rec { display: inline-block; width: .42em; height: .42em; border-radius: 50%; background: var(--accent); vertical-align: .12em; margin-right: .18em; }
+.brand p { margin: 8px 0 0; color: var(--muted); max-width: 60ch; }
+.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.tabs button { font: 600 14px var(--body); border: 0; background: transparent; color: var(--muted); padding: 8px 16px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tabs button:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Studio layout */
+.studio { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 28px; margin-top: 24px; align-items: start; }
+@media (max-width: 900px) { .studio { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 16px; }
+@media (min-width: 901px) { .panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); max-height: calc(100vh - 32px); overflow-y: auto; } }
+.panel h2 { font: 700 13px var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0; }
+.field { display: grid; gap: 6px; }
+.field label, .legend { font-weight: 600; font-size: 14px; }
+.field small, .hint { color: var(--muted); font-size: 12.5px; }
+input[type="text"], textarea { width: 100%; font: 15px/1.4 var(--body); color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; }
+textarea { resize: vertical; min-height: 64px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span { display: inline-block; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; font-weight: 500; cursor: pointer; background: var(--surface-2); }
+.chip input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.flowcard { position: relative; display: block; cursor: pointer; }
+.flowcard input { position: absolute; opacity: 0; pointer-events: none; }
+.flowcard .fc { display: grid; gap: 2px; height: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--surface-2); }
+.flowcard b { font-size: 14px; }
+.flowcard em { font-style: normal; color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+.flowcard input:checked + .fc { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--surface); }
+.flowcard input:focus-visible + .fc { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toggle { display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 500; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+.example { display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--surface-2); border: 1px dashed var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13px; color: var(--muted); }
+.example[hidden] { display: none !important; }
+.btn-ghost { font: 600 13px var(--body); background: transparent; border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.btn-ghost:hover { border-color: var(--ink); }
+
+/* Output */
+.out { min-width: 0; display: grid; gap: 20px; }
+.brief { display: grid; gap: 12px; }
+.brief .eyebrow { font: 600 12px var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--accent); }
+.brief h2 { font: 800 clamp(24px, 3.2vw, 34px)/1.1 var(--display); margin: 0; letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: anywhere; }
+.brief p { margin: 0; color: var(--muted); max-width: 70ch; }
+.timeline { display: flex; gap: 3px; width: 100%; }
+.seg { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--ink); border-radius: 4px; padding: 6px 8px; display: grid; gap: 1px; }
+.seg b { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seg span { font: 500 11.5px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.seg.hook { border-top-color: var(--accent); }
+.seg.cta { border-top-color: var(--bag); }
+.why { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--bag); border-radius: 6px; padding: 10px 14px; font-size: 14px; }
+.why b { font-weight: 700; }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.step { counter-increment: s; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+.step::before { content: counter(s); font: 800 18px/38px var(--display); text-align: center; width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--ink); }
+.step-body { min-width: 0; display: grid; gap: 10px; }
+.step-head { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.step-head h3 { margin: 0; font: 700 17px/1.3 var(--body); }
+.tool { font: 600 11.5px var(--mono); letter-spacing: .04em; text-transform: uppercase; border: 1.5px solid currentColor; border-radius: 4px; padding: 2px 7px; }
+.tool.gpt { color: var(--gpt); } .tool.flow { color: var(--flow); } .tool.cap { color: var(--cap); } .tool.tt { color: var(--accent); }
+.step-body p { margin: 0; max-width: 72ch; }
+.step-body ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
+.tip { font-size: 13.5px; color: var(--muted); }
+.tip b { color: var(--ink); }
+.prompt { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--code); }
+.prompt-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.prompt-head span { font: 600 12px var(--mono); color: var(--muted); min-width: 0; overflow-wrap: anywhere; }
+.copy { font: 600 12.5px var(--body); border: 0; background: var(--ink); color: var(--bg); border-radius: 6px; padding: 5px 12px; cursor: pointer; flex-shrink: 0; }
+.copy.done { background: var(--ok); color: #fff; }
+.prompt pre { margin: 0; padding: 12px; font: 13px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); max-height: 340px; overflow: auto; }
+.check { background: var(--surface); border: 2px solid var(--ink); border-radius: var(--r); padding: 16px 18px; display: grid; gap: 8px; }
+.check h3 { margin: 0 0 4px; font: 800 20px var(--display); }
+.check label { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--ok); flex-shrink: 0; }
+
+/* Kamus & Bonus */
+.page { margin-top: 24px; display: grid; gap: 22px; }
+.search { max-width: 420px; }
+.dict-group { display: grid; gap: 10px; }
+.dict-group h3 { margin: 0; font: 800 20px var(--display); }
+.dict-group > p { margin: 0; color: var(--muted); font-size: 14px; }
+.cmds { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.cmd { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.cmd:hover { border-color: var(--ink); }
+.cmd code { font: 600 13.5px var(--mono); color: var(--accent); overflow-wrap: anywhere; }
+.cmd span { font-size: 13.5px; }
+.cmd small { color: var(--muted); font-size: 12.5px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font: 500 12.5px var(--mono); background: var(--surface); border: 1px solid var(--line); border-radius: 5px; padding: 4px 8px; cursor: pointer; color: var(--ink); }
+.tag:hover { border-color: var(--accent); color: var(--accent); }
+.bonus { display: grid; gap: 14px; }
+details.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 16px; }
+details.card[open] { padding-bottom: 16px; }
+details.card summary { cursor: pointer; font: 700 17px var(--body); padding: 12px 0; list-style-position: outside; }
+details.card summary small { display: block; font: 400 13.5px var(--body); color: var(--muted); }
+details.card .inner { display: grid; gap: 12px; }
+details.card p { margin: 0; max-width: 72ch; }
+.links { display: flex; flex-wrap: wrap; gap: 10px; }
+.links a { color: var(--flow); font-weight: 600; }
+.jump { display: none; text-align: center; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 8px; padding: 10px; text-decoration: none; }
+@media (max-width: 900px) { .jump { display: block; } }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; }
+.foot { margin-top: 36px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 12px; }
+@media (prefers-reduced-motion: no-preference) { .copy, .tag, .cmd { transition: background .15s, border-color .15s, color .15s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="rec" aria-hidden="true"></span>Studio Prompt Afiliat</h1>
+      <p>Isi butiran produk dan pilih jenis video. Studio terus susun langkah ChatGPT, Google Flow dan CapCut, berserta kod visual yang sesuai untuk produk anda.</p>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Bahagian">
+      <button role="tab" id="tab-studio" aria-selected="true" data-tab="studio">Buat Video</button>
+      <button role="tab" id="tab-kamus" aria-selected="false" data-tab="kamus">Kamus Kod</button>
+      <button role="tab" id="tab-bonus" aria-selected="false" data-tab="bonus">Bonus</button>
+    </nav>
+  </header>
+
+  <!-- STUDIO -->
+  <section id="view-studio" class="studio" role="tabpanel" aria-labelledby="tab-studio">
+    <form class="panel" id="borang" autocomplete="off">
+      <h2>Butiran produk</h2>
+      <div class="example" id="contoh-bar">
+        <span>Borang diisi dengan <b>contoh</b>. Tukar kepada produk anda.</span>
+        <button type="button" class="btn-ghost" id="kosongkan">Kosongkan</button>
+      </div>
+      <div class="field">
+        <label for="f-nama">Nama produk</label>
+        <input type="text" id="f-nama" placeholder="cth. Kopi Susu Ais Botol 250ml">
+      </div>
+      <div class="field">
+        <span class="legend" id="lg-kat">Kategori</span>
+        <div class="chips" id="f-kat" role="radiogroup" aria-labelledby="lg-kat"></div>
+      </div>
+      <div class="field">
+        <label for="f-butiran">Rupa produk</label>
+        <textarea id="f-butiran" rows="3" placeholder="Warna, bahan, bentuk bungkusan, label"></textarea>
+        <small>Tulis dalam Bahasa Inggeris jika boleh. Hasil gambar biasanya lebih tepat.</small>
+      </div>
+      <div class="field">
+        <label for="f-latar">Latar / suasana</label>
+        <input type="text" id="f-latar" list="latar-list" placeholder="cth. kafe moden gelap">
+        <datalist id="latar-list"></datalist>
+      </div>
+      <div class="field">
+        <label for="f-warna">Warna brand</label>
+        <input type="text" id="f-warna" placeholder="cth. coklat gelap, krim, emas">
+      </div>
+      <div class="field">
+        <label for="f-masalah">Masalah pembeli</label>
+        <input type="text" id="f-masalah" placeholder="Apa yang pembeli rasa sebelum guna produk ini?">
+      </div>
+      <div class="field">
+        <label for="f-kelebihan">Kelebihan utama</label>
+        <input type="text" id="f-kelebihan" placeholder="2–3 kelebihan, dipisah koma">
+      </div>
+      <div class="field">
+        <label for="f-promo">Harga / promosi (pilihan)</label>
+        <input type="text" id="f-promo" placeholder="cth. RM5.90 hari ini sahaja">
+      </div>
+      <label class="toggle"><input type="checkbox" id="f-model"> Guna model (orang) dalam video</label>
+      <div class="field">
+        <span class="legend" id="lg-aliran">Jenis video</span>
+        <div class="flows" id="f-aliran" role="radiogroup" aria-labelledby="lg-aliran"></div>
+      </div>
+      <a class="jump" href="#output">Lihat langkah ↓</a>
+    </form>
+
+    <div class="out" id="output" aria-live="polite"></div>
+  </section>
+
+  <!-- KAMUS -->
+  <section id="view-kamus" class="page" role="tabpanel" aria-labelledby="tab-kamus" hidden>
+    <div class="field search">
+      <label for="cari">Cari kod</label>
+      <input type="text" id="cari" placeholder="cth. splash, drone, macro">
+      <small>Tekan mana-mana kod untuk salin.</small>
+    </div>
+    <div id="kamus"></div>
+  </section>
+
+  <!-- BONUS -->
+  <section id="view-bonus" class="page" role="tabpanel" aria-labelledby="tab-bonus" hidden>
+    <div class="bonus" id="bonus"></div>
+  </section>
+
+  <p class="foot">Kandungan disusun semula dalam Bahasa Melayu daripada modul "Dari Prompt Sampai Cuan" oleh Nayaka Design Creator. Ini bahan berbayar, jadi simpan pautan ini untuk kegunaan sendiri. Kod "/" ialah singkatan dalam prompt, bukan arahan rasmi ChatGPT atau Google Flow. Sebab itu setiap prompt di sini turut menyertakan penerangan produk.</p>
+</div>
+
+<div class="toast" id="toast" hidden>Disalin</div>
+
+<script>
+(() => {
+"use strict";
+
+/* ---------- Data: 34 kod visual gambar (ebook Kode Visual) ---------- */
+const CMD = {
+  food_hero: ["Makanan", "Foto hero makanan sebagai fokus utama", "Gambar pembuka dan thumbnail", "hero product photography, appetizing presentation, premium commercial advertising, perfect food styling, realistic texture, fresh ingredients, dramatic studio lighting, soft shadows, clean composition, shallow depth of field, ultra realistic, high-end food advertising photography, 8K"],
+  food_top: ["Makanan", "Foto makanan dari atas", "Tunjuk saiz hidangan, isi dan set menu", "top-down food photography, carefully arranged composition, premium commercial food advertisement, beautiful ingredient placement, natural shadows, elegant styling, realistic texture, clean background, editorial food photography, high detail"],
+  food_macro: ["Makanan", "Close-up tekstur yang menyelerakan", "3 saat pertama untuk tahan penonton", "extreme macro food photography, detailed texture, appetizing surface, crispy details, juicy texture, realistic moisture, cinematic lighting, shallow depth of field, premium commercial advertising, ultra realistic"],
+  food_splash: ["Makanan", "Bahan terbang di sekeliling produk", "Kemuncak sebelum ajakan membeli", "dynamic commercial food advertisement, ingredients flying around the product, splash and motion effects, frozen action, dramatic studio lighting, high-speed photography, sharp product focus, premium advertising campaign, photorealistic, 8K"],
+  drink_hero: ["Minuman", "Minuman sebagai bintang, embun realistik", "Bungkusan yang labelnya mesti terbaca", "premium beverage commercial photography, product centered, beautiful condensation, realistic droplets, dramatic studio lighting, luxury advertising aesthetic, clean composition, cinematic atmosphere, sharp focus, photorealistic, 8K"],
+  drink_splash: ["Minuman", "Percikan cecair yang dinamik", "Hook video", "dynamic beverage advertisement, liquid splash surrounding the bottle, frozen motion, realistic droplets, dramatic backlight, high-speed commercial photography, premium product presentation, ultra realistic, sharp details, 8K"],
+  drink_pour: ["Minuman", "Detik menuang ke dalam gelas", "Babak demo", "commercial beverage photography, liquid being poured into glass, beautiful flowing liquid, realistic reflections, condensation, cinematic lighting, premium advertising style, shallow depth of field, photorealistic"],
+  drink_lifestyle: ["Minuman", "Minuman dalam suasana gaya hidup", "Tunjuk bila minuman dinikmati", "lifestyle beverage commercial, attractive modern environment, natural human interaction, premium lifestyle atmosphere, soft cinematic sunlight, realistic photography, sophisticated composition, brand advertising campaign, photorealistic"],
+  product_hero: ["Produk", "Produk sebagai pusat perhatian", "Selamat untuk hampir semua barang", "premium commercial product photography, product as the main hero, perfect product proportions, clean presentation, studio lighting, controlled reflections, realistic materials, luxury advertising, minimal background, sharp focus, photorealistic, 8K"],
+  product_luxury: ["Produk", "Kesan mewah, hitam dan emas", "Naikkan nilai produk", "luxury product advertising, elegant dark studio environment, dramatic spotlight, premium reflections, sophisticated composition, high-end commercial photography, cinematic atmosphere, black and gold aesthetic, ultra realistic, 8K"],
+  product_minimal: ["Produk", "Bersih, moden, latar satu warna", "Produk yang warnanya sudah kuat", "minimalist commercial product photography, clean monochromatic background, elegant composition, soft studio lighting, subtle shadows, premium branding aesthetic, modern advertising campaign, photorealistic"],
+  product_floating: ["Produk", "Produk terapung di udara", "Hook video", "floating product commercial advertisement, product suspended in the air, dynamic composition, dramatic lighting, subtle particles, realistic shadows, premium advertising campaign, clean background, photorealistic, high detail"],
+  product_360: ["Produk", "Sudut tiga suku, bentuk tepat", "Babak bukti: bentuk dan label tepat", "professional 360-degree product presentation, front three-quarter view, perfectly centered product, studio lighting, clean seamless background, accurate product geometry, realistic materials, premium commercial photography"],
+  dramatic_product: ["Produk", "Asap dan partikel dramatik", "Guna sedikit sahaja, produk mesti jelas", "dramatic commercial product advertising, dynamic composition, powerful lighting, smoke, particles and controlled environmental effects, product remains perfectly sharp and recognizable, cinematic advertising photography, ultra realistic, high detail"],
+  fashion_editorial: ["Fashion", "Gaya majalah fesyen mewah", "Kesan premium", "high-end fashion editorial photography, professional fashion model wearing the product, confident pose, sophisticated styling, cinematic studio lighting, luxury fashion magazine aesthetic, realistic fabric texture, detailed garment construction, photorealistic, premium campaign"],
+  fashion_street: ["Fashion", "Streetwear di tengah bandar", "Audiens muda", "streetwear fashion campaign, professional model wearing the clothing, modern urban environment, natural confident pose, cinematic lighting, realistic fabric texture, contemporary fashion photography, photorealistic"],
+  fashion_studio: ["Fashion", "Model badan penuh di studio", "Tunjuk keseluruhan pakaian", "professional fashion studio photography, model wearing the exact clothing, full body composition, elegant pose, clean studio background, softbox lighting, accurate clothing details, realistic skin and fabric, commercial fashion campaign, high resolution"],
+  fashion_lifestyle: ["Fashion", "Pakaian dalam aktiviti harian", "Babak demo", "lifestyle fashion advertising, professional model wearing the product, beautiful modern environment, natural movement, authentic expression, soft natural lighting, cinematic composition, premium commercial photography, photorealistic"],
+  fashion_catalog: ["Fashion", "Katalog e-dagang, warna dan saiz tepat", "Babak bukti", "e-commerce fashion catalog photography, model wearing the exact garment, full body, front-facing pose, clean neutral background, even studio lighting, accurate garment color and proportions, sharp fabric details, professional product photography"],
+  model_product: ["Model", "Model berinteraksi dengan produk", "Semua kategori, bila perlu sentuhan manusia", "professional commercial advertising, attractive model naturally interacting with the product, product remains clearly visible and recognizable, authentic expression, premium lifestyle environment, cinematic lighting, realistic skin and materials, high-end advertising photography"],
+  beauty_hero: ["Kosmetik", "Kosmetik sebagai hero produk", "Hook dan CTA", "luxury beauty product advertising, cosmetic product centered as hero, premium studio lighting, elegant reflections, soft shadows, sophisticated background, clean luxury composition, photorealistic, high-end beauty campaign, 8K"],
+  beauty_model: ["Kosmetik", "Model memakai produk kosmetik", "Babak demo", "high-end beauty campaign, professional beauty model using the product, perfect natural skin texture, elegant makeup, soft beauty lighting, detailed face, luxury cosmetic advertising, photorealistic"],
+  beauty_macro: ["Kosmetik", "Tekstur kosmetik dari dekat", "Babak detail", "extreme macro beauty photography, detailed cosmetic texture, realistic skin, luxury studio lighting, glossy highlights, shallow depth of field, premium beauty advertisement, ultra detailed, photorealistic"],
+  beauty_flatlay: ["Kosmetik", "Susunan kosmetik dari atas", "Tunjuk varian atau shade", "luxury cosmetic flat lay, carefully arranged beauty products and ingredients, top-down composition, elegant shadows, premium marble surface, soft natural lighting, high-end beauty editorial photography"],
+  skincare_clean: ["Skincare", "Bilik air mewah yang bersih", "Rasa segar dan bersih", "clean skincare commercial photography, minimalist luxury bathroom environment, product centered, soft natural daylight, fresh water droplets, clean white and beige aesthetic, premium beauty campaign, photorealistic"],
+  skincare_nature: ["Skincare", "Dikelilingi bahan semula jadi", "Hook untuk produk berbahan alam", "natural skincare advertising, product surrounded by botanical ingredients, fresh leaves, water droplets, soft sunlight, organic premium aesthetic, realistic textures, clean commercial composition, photorealistic"],
+  skincare_luxury: ["Skincare", "Botol kaca, latar gelap premium", "CTA kelas premium", "luxury skincare advertising, elegant dark background, premium glass bottle, dramatic spotlight, beautiful reflections, high-end cosmetic campaign, sophisticated composition, photorealistic, 8K"],
+  natural_product: ["Skincare", "Suasana organik dan semula jadi", "Produk berasaskan bahan alam", "natural organic commercial advertising, botanical elements, fresh ingredients, soft sunlight, realistic textures, earthy premium aesthetic, clean composition, authentic natural atmosphere, photorealistic"],
+  ecommerce: ["Format", "Foto katalog latar putih", "Babak bukti dan gambar kedai", "professional e-commerce product photography, product centered, clean white background, accurate colors, accurate proportions, sharp details, realistic shadows, commercial catalog photography, high resolution"],
+  social_portrait: ["Format", "Menegak 9:16 untuk TikTok, Reels, Shorts", "Letak di hujung hampir semua kombinasi", "premium commercial advertising, vertical 9:16 composition, strong visual hierarchy, product clearly visible, cinematic lighting, social media advertising aesthetic, high contrast, photorealistic, optimized for mobile viewing"],
+  social_square: ["Format", "Segi empat 1:1 untuk feed", "Hantaran feed", "premium commercial advertisement, square 1:1 composition, product centered, strong visual hierarchy, clean background, cinematic commercial lighting, high-end advertising photography"],
+  cinematic_ad: ["Gaya", "Iklan bergaya filem", "Babak hook", "cinematic commercial advertisement, hero product shot, dramatic environment, beautiful atmospheric lighting, volumetric light, subtle particles, controlled reflections, premium brand campaign, cinematic color grading, photorealistic, high detail"],
+  luxury_ad: ["Gaya", "Kempen ultra premium", "Kesan mahal", "ultra premium luxury advertising campaign, minimal elegant composition, dramatic studio lighting, beautiful reflections, sophisticated environment, exclusive high-end brand aesthetic, cinematic photography, photorealistic, 8K"],
+  minimal_ad: ["Gaya", "Minimalis dengan ruang kosong", "Babak CTA, ruang untuk teks harga", "minimalist commercial advertisement, single hero product, simple elegant background, perfect negative space, soft directional lighting, subtle realistic shadow, premium modern branding, clean composition, photorealistic"]
+};
+
+/* ---------- Data: kombinasi tag Google Flow ---------- */
+const FLOW = {
+  1: ["Produk premium", "/ultraphotorealistic /floatingad /heroProduct /premiumcommercial /cinematiclighting /rimlighting /slowzoom /realisticPhysics /8kdetail"],
+  2: ["Produk jatuh lalu terapung", "/ultraphotorealistic /dynamicmotion /productReveal /productlevitation /slowmotion /particleburst /cinematiclighting /orbitcamera /realisticPhysics"],
+  3: ["Gadget", "/ultraphotorealistic /premiumproductshot /macroshot /threequarterview /reflectioncontrol /rimlighting /orbitcamera /slowzoom /luxurycommercial /8kdetail"],
+  4: ["Kosmetik", "/ultraphotorealistic /luxuryadvertising /floatingproduct /macroshot /softlighting /glowReveal /slowmotion /particleburst /cinematiccommercial"],
+  5: ["Makanan & minuman", "/ultraphotorealistic /foodcommercial /macroshot /splashReveal /slowmotion /realisticPhysics /dramaticlighting /closeup /heroProduct"],
+  6: ["Pembuka (hook)", "/viralproductvideo /stronghook /ultraphotorealistic /fastzoom /explosivereveal /floatingad /dynamicmotion /cinematiclighting /scrollstopper"],
+  7: ["Penutup + CTA", "/heroProduct /productReveal /slowzoom /premiumcommercial /minimaliststudio /cinematiclighting /brandHeroShot /ctaEnding /ultraphotorealistic"],
+  fashion: ["Fashion (camera direction)", "/Model Walks Through The City /Low Angle Tracking Shot /Golden Hour Sunlight /High End Fashion Film /ultraphotorealistic"],
+  sneaker: ["Kasut (camera direction)", "/FPV Chase Shot /Product Hero Shot /Speed Ramp /Wet Street Reflection /ultraphotorealistic"]
+};
+
+const LOCK_BASE = "Use the uploaded product photo as reference.";
+const LOCK_TAIL = "Only change: background, props, lighting, environment.";
+
+/* ---------- Data: tetapan setiap kategori ---------- */
+const KAT = {
+  makanan: {
+    label: "Makanan", flow: 5,
+    lock: "Keep exact packaging shape, exact label placement, exact logo, exact food appearance and portion.",
+    lima: { hook: ["food_splash", "social_portrait"], detail: ["food_macro", "food_hero"], demo: ["food_top", "model_product"], bukti: ["food_hero", "ecommerce"], cta: ["cinematic_ad", "social_portrait"] },
+    latar: ["meja restoran gelap", "dapur rumah moden", "gerai pasar malam waktu malam", "meja kayu dengan cahaya pagi"],
+    papan: "hand picking up the food/macro detail texture crispy and juicy/steam and sauce drip/top view on the table/restaurant ambience/hero shot product",
+    satuKod: "/Macro Product Shot",
+    asmr: "/adcreative/asmr/food/macro close-up/crispy texture/sizzling sound/slow motion/realistic lighting/9:16",
+    nota: "Tekstur rangup dan berjus menahan penonton. /food_macro paling kuat untuk 3 saat pertama, /food_splash untuk kemuncak sebelum CTA. Guna satu kesan sahaja bagi setiap gambar.",
+    contoh: { nama: "Nasi Ayam Goreng Berempah", butiran: "crispy golden fried chicken, steaming white rice, sambal on the side, brown paper box packaging", latar: "gerai pasar malam waktu malam", warna: "merah, kuning keemasan", masalah: "lapar lepas kerja, malas masak", kelebihan: "ayam rangup, sambal pedas, porsi besar", promo: "RM9.90 set lengkap" }
+  },
+  minuman: {
+    label: "Minuman", flow: 5,
+    lock: "Keep exact bottle shape, exact label placement, exact logo, exact product color.",
+    lima: { hook: ["drink_splash", "dramatic_product", "social_portrait"], detail: ["drink_hero", "social_portrait"], demo: ["drink_pour", "drink_lifestyle"], bukti: ["product_360", "ecommerce"], cta: ["luxury_ad", "social_portrait"] },
+    latar: ["kafe moden gelap", "meja pejabat waktu petang", "tepi pantai waktu senja", "gim selepas bersenam"],
+    papan: "pouring into a glass with ice/macro condensation droplets on the bottle/model drinking and smiling/lifestyle cafe moment/liquid splash around the bottle/hero shot product",
+    satuKod: "/Product Floating Shot",
+    asmr: "/adcreative/asmr/food/macro close-up/ice cubes clinking/liquid pouring sound/condensation droplets/slow motion/realistic lighting/9:16",
+    nota: "Percikan dan embun pada botol jadi hook yang kuat. Kunci label botol supaya tulisan pada bungkusan tidak berubah.",
+    contoh: { nama: "Kopi Susu Ais Botol 250ml", butiran: "transparent glass bottle, creamy brown iced coffee, cream and dark brown label, gold cap", latar: "kafe moden gelap", warna: "coklat gelap, krim, emas", masalah: "mengantuk waktu petang, kopi kedai mahal", kelebihan: "kurang manis, biji kopi tempatan, sejuk terus dari peti", promo: "RM5.90 hari ini sahaja" }
+  },
+  gadget: {
+    label: "Gadget", flow: 3,
+    lock: "Keep exact product shape, exact buttons and ports, exact logo, exact product color and finish.",
+    lima: { hook: ["product_floating", "cinematic_ad", "social_portrait"], detail: ["product_hero", "product_luxury"], demo: ["model_product", "social_portrait"], bukti: ["product_360", "ecommerce"], cta: ["minimal_ad", "social_portrait"] },
+    latar: ["meja kerja minimalis", "studio gelap dengan lampu neon", "dalam kereta", "bilik tidur moden"],
+    papan: "model using the gadget in daily life/macro detail of material and buttons/product floating reveal/lifestyle environment/360 orbit around the product/hero shot product",
+    satuKod: "/Orbit Camera 360°",
+    asmr: "/adcreative/asmr/product/luxury macro shot/unboxing/soft tapping/button clicks/slow motion/cinematic commercial/9:16",
+    nota: "/product_floating untuk hook. /product_360 untuk babak bukti kerana bentuk dan label kelihatan tepat. Kilauan badan gadget paling cantik dengan /rimlighting.",
+    contoh: { nama: "Earbuds Wayarles ANC", butiran: "wireless earbuds in a matte white charging case, small LED indicator, silver logo on lid", latar: "meja kerja minimalis", warna: "putih, perak", masalah: "bunyi bising dalam LRT, bateri cepat habis", kelebihan: "ANC, bateri 30 jam, bluetooth 5.3", promo: "Diskaun 40% minggu ini" }
+  },
+  barang: {
+    label: "Barang rumah", flow: 1,
+    lock: "Keep exact product shape, exact label placement, exact logo, exact product color.",
+    lima: { hook: ["product_floating", "dramatic_product", "social_portrait"], detail: ["product_hero", "social_portrait"], demo: ["model_product", "social_portrait"], bukti: ["product_360", "ecommerce"], cta: ["minimal_ad", "social_portrait"] },
+    latar: ["dapur moden terang", "ruang tamu minimalis", "balkoni dengan pokok", "bilik air bersih"],
+    papan: "model using the product at home/macro detail of material/product reveal floating/before and after problem solved/clean home lifestyle/hero shot product",
+    satuKod: "/Product Reveal From Shadow",
+    asmr: "/adcreative/asmr/product/luxury macro shot/soft tapping/unboxing/satisfying cleaning/slow motion/cinematic commercial/9:16",
+    nota: "/product_hero selamat untuk hampir semua barang. Babak demo paling penting untuk barang rumah kerana pembeli mahu nampak masalah selesai.",
+    contoh: { nama: "Blender Mudah Alih", butiran: "portable blender, white body, transparent cup, fresh fruit inside, USB-C port", latar: "dapur moden terang", warna: "putih, hijau pudina", masalah: "nak smoothie di pejabat tapi tiada blender", kelebihan: "cas USB, 6 bilah, mudah dicuci", promo: "RM39 percuma penghantaran" }
+  },
+  fashion: {
+    label: "Fashion", flow: "fashion",
+    lock: "Keep exact garment design, exact color, exact print and logo placement, exact fabric texture and fit.",
+    lima: { hook: ["fashion_street", "social_portrait"], detail: ["fashion_editorial"], demo: ["fashion_lifestyle", "model_product"], bukti: ["fashion_catalog", "fashion_studio"], cta: ["fashion_editorial", "social_portrait"] },
+    latar: ["jalan bandar Kuala Lumpur waktu senja", "kafe hipster", "studio putih", "taman bandar waktu pagi"],
+    papan: "model walk in the street city/angle camera cinematic/action model international/shot camera macro detail produk fabric and stitching/sunlight views/drone views",
+    satuKod: "/FPV Flythrough along the street",
+    asmr: "/adcreative/asmr/product/luxury macro shot/unboxing/fabric rustling/soft folding/slow motion/cinematic commercial/9:16",
+    nota: "Model dan suasana jalanan bantu penonton bayangkan cara memakainya. /fashion_catalog menjaga warna dan saiz kekal tepat untuk babak bukti.",
+    contoh: { nama: "T-Shirt Oversize Hitam", butiran: "oversized black cotton t-shirt, small white chest print, relaxed fit, heavyweight fabric", latar: "jalan bandar Kuala Lumpur waktu senja", warna: "hitam, putih", masalah: "baju cepat lusuh dan panas", kelebihan: "kapas 240gsm, tak jarang, potongan oversize", promo: "Beli 2 RM59" }
+  },
+  kasut: {
+    label: "Kasut", flow: "sneaker",
+    lock: "Keep exact shoe shape, exact sole design, exact logo, exact colorway and materials.",
+    lima: { hook: ["product_floating", "fashion_street", "social_portrait"], detail: ["product_hero", "product_luxury"], demo: ["model_product", "fashion_lifestyle"], bukti: ["product_360", "ecommerce"], cta: ["cinematic_ad", "social_portrait"] },
+    latar: ["jalan bandar basah selepas hujan", "trek larian taman", "gelanggang bola keranjang", "studio gelap"],
+    papan: "model walk and run in the street city/low angle tracking shot/shot camera macro detail produk sole material and stitching/wet street reflection/drone views/hero shot product",
+    satuKod: "/FPV Chase Shot",
+    asmr: "/adcreative/asmr/product/luxury macro shot/unboxing shoe box/lace pulling/sole tapping/slow motion/cinematic commercial/9:16",
+    nota: "Kasut paling sesuai dengan FPV dan speed ramp. Tunjuk tapak, bahan dan jahitan dari dekat dalam babak detail.",
+    contoh: { nama: "Kasut Larian Ringan", butiran: "white running sneaker, orange accents, knit upper, thick foam sole", latar: "jalan bandar basah selepas hujan", warna: "putih, oren", masalah: "kaki sakit lepas jalan jauh", kelebihan: "ringan 220g, tapak empuk, kain bernafas", promo: "RM129 sahaja" }
+  },
+  kosmetik: {
+    label: "Kosmetik", flow: 4,
+    lock: "Keep exact packaging shape, exact label placement, exact logo, exact shade and product color.",
+    lima: { hook: ["beauty_hero", "luxury_ad", "social_portrait"], detail: ["beauty_macro"], demo: ["beauty_model", "model_product"], bukti: ["beauty_flatlay", "ecommerce"], cta: ["luxury_ad", "social_portrait"] },
+    latar: ["studio kecantikan mewah", "meja solek marmar", "bilik tidur cahaya lembut"],
+    papan: "model applying the product/macro texture and shine/flatlay of shades/luxury beauty studio/glow reveal/hero shot product",
+    satuKod: "/Macro Product Detail",
+    asmr: "/adcreative/asmr/product/luxury macro shot/soft tapping/cap clicking/glass reflections/slow motion/cinematic commercial/9:16",
+    nota: "/beauty_flatlay untuk tunjuk varian atau shade, /beauty_macro untuk tekstur. Pastikan warna produk sama seperti asal.",
+    contoh: { nama: "Lipmatte Tahan Lama", butiran: "premium red lipstick, black and gold tube, magnetic cap", latar: "studio kecantikan mewah", warna: "merah, hitam, emas", masalah: "lipstik cepat pudar dan melekat pada cawan", kelebihan: "tahan 12 jam, tak kering, halal", promo: "Beli 2 percuma 1" }
+  },
+  skincare: {
+    label: "Skincare", flow: 4,
+    lock: "Keep exact bottle shape, exact label placement, exact logo, exact product color.",
+    lima: { hook: ["skincare_nature", "social_portrait"], detail: ["beauty_macro"], demo: ["beauty_model", "skincare_clean"], bukti: ["product_360", "ecommerce"], cta: ["skincare_luxury", "social_portrait"] },
+    latar: ["bilik air mewah yang bersih", "taman dengan cahaya pagi", "meja solek putih"],
+    papan: "model applying on the skin/macro serum texture/botanical ingredients around the bottle/clean luxury bathroom/water droplets/hero shot product",
+    satuKod: "/Slow Push In",
+    asmr: "/adcreative/asmr/product/luxury macro shot/soft tapping/liquid drops/glass reflections/slow motion/cinematic commercial/9:16",
+    nota: "Fokus pada suasana bersih dan bahan, bukan hasil pada kulit. Elak gambar kulit sempurna yang tidak realistik, kerana platform boleh tolak.",
+    contoh: { nama: "Serum Aloe Vera 30ml", butiran: "facial serum in frosted glass dropper bottle, green and white label", latar: "bilik air mewah yang bersih", warna: "hijau, putih", masalah: "kulit kering dan kusam", kelebihan: "aloe vera 90%, ringan, sesuai kulit sensitif", promo: "RM29.90 harga pelancaran" }
+  }
+};
+const KAT_ORDER = ["makanan", "minuman", "gadget", "barang", "fashion", "kasut", "kosmetik", "skincare"];
+
+/* ---------- Jenis video (aliran kerja) ---------- */
+const ALIRAN = {
+  pantas: { label: "Iklan 30 saat", ringkas: "Hook, masalah, CTA. Untuk pemula.", sumber: "Materi pemula" },
+  premium: { label: "Iklan premium", ringkas: "Kolaj produk + storyboard, 3 klip.", sumber: "Materi premium 1 & 2" },
+  lima: { label: "5 babak", ringkas: "5 gambar dijadikan video 15–30 saat.", sumber: "Ebook Kode Visual" },
+  asmr: { label: "ASMR", ringkas: "Tanpa muzik dan narasi.", sumber: "ASMR Prompt Kit" }
+};
+
+const MOTION = {
+  hook: "floating particles drift around the product, light reflection moves across the surface, slow push-in",
+  detail: "slow push-in toward the product, product stays sharp, subtle steam and droplets",
+  demo: "model turns toward camera and smiles naturally, gentle handheld movement",
+  bukti: "slow orbit around the product, soft light sweep across the surface",
+  cta: "pull-back reveal to show the full product, leave empty space for text"
+};
+const MOTION_LOCK = "Product remains sharp and recognizable, no changes to logo, label or shape. Small, slow movements only.";
+
+const LIMA_BABAK = [
+  ["hook", "Hook", "0–3 s", "Hentikan penonton daripada skrol"],
+  ["detail", "Detail", "3–8 s", "Tunjuk tekstur dan kualiti"],
+  ["demo", "Demo", "8–18 s", "Produk dipakai atau dinikmati"],
+  ["bukti", "Bukti", "18–24 s", "Bentuk, warna dan label tepat"],
+  ["cta", "CTA", "24–30 s", "Ajak tekan beg kuning"]
+];
+
+const ASMR_PANEL = [
+  ["Makro tekstur", "extreme macro of the product texture, camera moving slowly"],
+  ["Tangan", "close-up of hands touching, cutting or opening the product"],
+  ["Aksi utama", "main ASMR action with realistic motion and texture detail"],
+  ["Super makro", "super macro detail: liquid drops, crumbs or steam depending on the product"],
+  ["Slow motion", "slow motion, cinematic lighting, shallow depth of field, smooth camera movement"],
+  ["Hero shot", "product hero shot, premium composition, dramatic lighting, satisfying ending"]
+];
+
+/* ---------- Utiliti ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const KEY = "studio-afiliat-v1";
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; } },
+  set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* abaikan */ } }
+};
+
+/* ---------- Bina borang ---------- */
+$("#f-kat").innerHTML = KAT_ORDER.map(k =>
+  `<label class="chip"><input type="radio" name="kat" id="kat-${k}" value="${k}"><span>${KAT[k].label}</span></label>`).join("");
+$("#f-aliran").innerHTML = Object.entries(ALIRAN).map(([k, a]) =>
+  `<label class="flowcard"><input type="radio" name="aliran" id="aliran-${k}" value="${k}"><span class="fc"><b>${a.label}</b><em>${a.ringkas}</em></span></label>`).join("");
+
+const FIELDS = ["nama", "butiran", "latar", "warna", "masalah", "kelebihan", "promo"];
+
+function readForm() {
+  const P = {};
+  FIELDS.forEach(f => P[f] = $("#f-" + f).value.trim());
+  P.kat = (document.querySelector('input[name="kat"]:checked') || {}).value || "minuman";
+  P.aliran = (document.querySelector('input[name="aliran"]:checked') || {}).value || "pantas";
+  P.model = $("#f-model").checked;
+  return P;
+}
+function writeForm(P) {
+  FIELDS.forEach(f => $("#f-" + f).value = P[f] || "");
+  const k = $("#kat-" + (P.kat || "minuman")); if (k) k.checked = true;
+  const a = $("#aliran-" + (P.aliran || "pantas")); if (a) a.checked = true;
+  $("#f-model").checked = !!P.model;
+}
+function setLatarList(kat) {
+  $("#latar-list").innerHTML = KAT[kat].latar.map(l => `<option value="${esc(l)}"></option>`).join("");
+}
+
+/* ---------- Penjana prompt ---------- */
+const nm = P => P.nama || "[nama produk]";
+function productLines(P, withLock = true) {
+  const K = KAT[P.kat];
+  const lines = [`Product: ${nm(P)}${P.butiran ? " (" + P.butiran + ")" : ""}`];
+  if (P.latar) lines.push(`Setting: ${P.latar}`);
+  if (P.warna) lines.push(`Brand colors: ${P.warna}`);
+  if (withLock) lines.push(`${LOCK_BASE} ${K.lock} ${LOCK_TAIL}`);
+  return lines.join("\n");
+}
+function flowTags(key) { return FLOW[key][1]; }
+function imagePrompt(codes, P) {
+  const head = "/" + codes.join(" /");
+  const visual = codes.map(c => CMD[c][3]).join(", ");
+  return `${head}\n\n${productLines(P, false)}\nVisual: ${visual}\nAspect ratio: 9:16\n${LOCK_BASE} ${KAT[P.kat].lock} ${LOCK_TAIL}`;
+}
+
+function captionStep(P) {
+  return {
+    tool: "tt", toolLabel: "ChatGPT → TikTok", title: "Tulis kapsyen dan hashtag",
+    text: "Dalam chat ChatGPT yang sama, minta kapsyen untuk hantaran TikTok anda.",
+    prompts: [["Prompt kapsyen", `Tulis 3 pilihan kapsyen TikTok dalam Bahasa Melayu santai untuk ${nm(P)}.
+- Mula dengan hook satu ayat yang buat orang berhenti skrol.
+${P.masalah ? `- Sentuh masalah ini: ${P.masalah}.\n` : ""}${P.kelebihan ? `- Sebut kelebihan: ${P.kelebihan}.\n` : ""}${P.promo ? `- Sebut tawaran: ${P.promo}.\n` : ""}- Tutup dengan ajakan tekan beg kuning.
+- Tambah 5 hashtag yang relevan.
+- Jangan buat dakwaan yang tidak benar atau janji hasil yang melampau.`]]
+  };
+}
+
+function buildPantas(P) {
+  const K = KAT[P.kat];
+  const t1 = flowTags(6) + " /vertical9x16", t2 = flowTags(K.flow) + " /vertical9x16", t3 = flowTags(7) + " /vertical9x16";
+  const desc = `${nm(P)}${P.butiran ? ", " + P.butiran : ""}${P.latar ? ". Setting: " + P.latar : ""}.`;
+  return {
+    timeline: [["Hook", "0–10 s", "hook"], ["Masalah & penyelesaian", "10–20 s", ""], ["CTA", "20–30 s", "cta"]],
+    steps: [
+      { tool: "gpt", title: "Buka ChatGPT dan muat naik foto produk", text: "Mulakan chat baru. Muat naik screenshot halaman produk atau foto produk yang jelas, tapi jangan tekan hantar dulu.", tip: "Foto terang dan tidak kabur membantu label dan logo kekal tepat." },
+      { tool: "gpt", title: "Jana storyboard 6 panel", text: "Tampal prompt ini bersama foto tadi, kemudian hantar. Simpan gambar storyboard yang terhasil.", prompts: [["Prompt gambar storyboard", `/adcreative/storyboard 6 panel image/rasio 9:16\n\n${productLines(P)}`]] },
+      { tool: "gpt", title: "Minta ChatGPT tulis prompt video 3 babak", text: "Dalam chat yang sama, tampal prompt ini. ChatGPT akan tulis prompt video dan narasi untuk setiap babak berdasarkan storyboard tadi.", prompts: [["Prompt video", `Buatkan prompt video dengan kod kunci produk sesuai dengan storyboard di atas dengan /durasi 30 saat /3 babak /setiap babak 10 saat /iklan komersial /narasi /hook /problem solve /cta
+
+Produk: ${nm(P)}${P.butiran ? " (" + P.butiran + ")" : ""}
+${P.masalah ? "Masalah pembeli: " + P.masalah + "\n" : ""}${P.kelebihan ? "Kelebihan utama: " + P.kelebihan + "\n" : ""}${P.promo ? "Tawaran: " + P.promo + "\n" : ""}
+BABAK 1 – 10 saat – HOOK
+BABAK 2 – 10 saat – PROBLEM & SOLVE
+BABAK 3 – 10 saat – CTA (ajak tekan beg kuning)
+
+Tulis narasi dalam Bahasa Melayu santai. Masukkan kod visual ini dalam prompt setiap babak:
+Babak 1: ${t1}
+Babak 2: ${t2}
+Babak 3: ${t3}
+Kekalkan bentuk, label, logo dan warna produk sama seperti foto rujukan.`]] },
+      { tool: "flow", title: "Buka Google Flow dan muat naik storyboard", text: "Buat projek baru di Google Flow. Muat naik gambar storyboard 6 panel sebagai rujukan visual." },
+      { tool: "flow", title: "Jana video satu babak pada satu masa", text: "Tampal prompt Babak 1 dari ChatGPT dan tekan generate. Ulang untuk Babak 2 dan Babak 3. Jika anda mahu tulis sendiri, guna prompt di bawah.", prompts: [
+        ["Babak 1 · Hook", `${t1}\n${desc}`],
+        ["Babak 2 · Masalah & penyelesaian", `${t2}\n${desc}${P.masalah ? " Problem: " + P.masalah + "." : ""}${P.kelebihan ? " Solution: " + P.kelebihan + "." : ""}`],
+        ["Babak 3 · CTA", `${t3}\n${desc} Leave clean empty space for price text.`]
+      ], tip: "<b>Tip:</b> tukar 1–2 tag sahaja setiap kali cuba semula, supaya mudah banding hasil." },
+      { tool: "cap", title: "Cantum dan kemas di CapCut", list: ["Susun klip Babak 1, 2, 3 jadi satu video 30 saat.", "Upscale resolusi supaya tajam.", "Tambah transisi halus antara babak.", `Letak teks CTA${P.promo ? " dan harga (" + esc(P.promo) + ")" : ""} di babak akhir, beserta ikon beg kuning.`] },
+      captionStep(P)
+    ]
+  };
+}
+
+function buildPremium(P) {
+  const K = KAT[P.kat];
+  const setA = "/heroProduct /productReveal /slowzoom /premiumcommercial /minimaliststudio /cinematiclighting /brandHeroShot /ctaEnding /ultraphotorealistic";
+  const setB = "/orbitcamera /slowzoom /cinematiclighting /floatingad /premiumcommercial /ultraphotorealistic /8kdetail /vertical9x16";
+  const desc = `${nm(P)}${P.butiran ? ", " + P.butiran : ""}${P.latar ? ". Setting: " + P.latar : ""}.`;
+  return {
+    timeline: [["Klip 1 · Orbit", "± 8 s", "hook"], ["Klip 2 · Kamera", "± 8 s", ""], ["Klip 3 · Hero + CTA", "± 8 s", "cta"]],
+    steps: [
+      { tool: "gpt", title: "Buka ChatGPT dan muat naik rujukan", text: P.model ? "Mulakan chat baru. Muat naik foto produk dan foto model sebagai rujukan." : "Mulakan chat baru. Muat naik foto produk yang jelas. Klik ikon + / lampiran, tunggu foto muncul, jangan hantar dulu.", tip: "Guna foto yang tajam supaya produk dan model kekal konsisten." },
+      { tool: "gpt", title: "Gambar 1: kolaj detail produk", text: "Hasilnya satu kolaj menegak: hero shot di atas, beberapa sudut produk, dan detail bahan. Simpan sebagai Gambar 1.", prompts: [["Prompt Gambar 1", `/adcreative detail produk\n\n${productLines(P)}`]] },
+      { tool: "gpt", title: "Gambar 2: storyboard 6 panel", text: "Dalam chat yang sama, tampal prompt storyboard ini. Simpan hasilnya sebagai Gambar 2.", prompts: [["Prompt Gambar 2", `/storyboard 6 panel/iklan komersial/${K.papan}/angle camera cinematic/rasio 9:16${P.model ? "/model promotion" : ""}\n\n${productLines(P)}`]] },
+      { tool: "flow", title: "Buka Google Flow, muat naik Gambar 1 dan 2", text: "Buat projek baru. Pastikan kedua-dua gambar sudah masuk sebelum tulis prompt video." },
+      { tool: "flow", title: "Jana 3 klip, satu set kod bagi setiap klip", text: "Tampal satu set sahaja, tekan generate, kemudian ulang dengan set seterusnya. Jangan gabungkan set dalam satu prompt.", prompts: [
+        ["Klip 1 · Set B (orbit & terapung)", `${setB}\n${desc}`],
+        [`Klip 2 · Satu kod kamera`, `${K.satuKod}\n${desc}`],
+        ["Klip 3 · Set A (hero & penutup)", `${setA} /vertical9x16\n${desc}`]
+      ], tip: "<b>Peraturan modul:</b> kalau hasil bersepah, buang semua kod lain dan guna satu kod kamera sahaja, seperti klip 2." },
+      { tool: "cap", title: "Kemas di CapCut", list: ["Cantum 3 klip mengikut alur cerita produk.", "Upscale resolusi.", "Sambung klip dengan transisi halus.", "Tambah teks CTA dan harga di klip terakhir."] },
+      captionStep(P)
+    ]
+  };
+}
+
+function buildLima(P) {
+  const K = KAT[P.kat];
+  const images = LIMA_BABAK.map(([key, label, t]) => [`${label} · ${t} · ${K.lima[key].map(c => "/" + c).join(" ")}`, imagePrompt(K.lima[key], P)]);
+  const motions = LIMA_BABAK.map(([key, label]) => [`Gerak ${label}`, `${MOTION[key]}. ${MOTION_LOCK} Vertical 9:16.`]);
+  return {
+    timeline: LIMA_BABAK.map(([k, l, t]) => [l, t, k === "hook" ? "hook" : k === "cta" ? "cta" : ""]),
+    steps: [
+      { tool: "gpt", title: "Buka ChatGPT dan muat naik foto produk", text: "Satu chat untuk satu produk. Semua 5 gambar guna foto rujukan yang sama.", tip: "Leonardo.Ai juga boleh guna prompt yang sama." },
+      { tool: "gpt", title: "Jana 5 gambar, satu bagi setiap babak", text: "Tampal satu prompt, tunggu gambar siap, kemudian tampal prompt seterusnya. Semua gambar 9:16 dengan palet warna dan PRODUCT LOCK yang sama.", prompts: images, tip: "<b>Satu kesan utama bagi setiap gambar</b> (percikan, asap atau partikel). Jangan tindih banyak kesan." },
+      { tool: "flow", title: "Hidupkan setiap gambar jadi klip 3–5 saat", text: "Guna Google Flow atau alat image-to-video pilihan anda. Muat naik gambar babak dan tampal prompt gerak yang sepadan.", prompts: motions },
+      { tool: "gpt", title: "Tulis skrip voice over", text: "Minta ChatGPT tulis narasi yang ikut 5 babak.", prompts: [["Prompt skrip", `Tulis skrip voice over 30 saat dalam Bahasa Melayu santai untuk video TikTok ${nm(P)}, ikut 5 babak:
+1. Hook (0–3 saat): satu ayat yang hentikan skrol.
+2. Detail (3–8 saat): tekstur dan kualiti produk.
+3. Demo (8–18 saat): produk dipakai atau dinikmati.
+4. Bukti (18–24 saat): kenapa produk ini boleh dipercayai.
+5. CTA (24–30 saat): ajak tekan beg kuning${P.promo ? ", sebut " + P.promo : ""}.
+${P.masalah ? "Masalah pembeli: " + P.masalah + "\n" : ""}${P.kelebihan ? "Kelebihan: " + P.kelebihan + "\n" : ""}Ayat pendek, mudah disebut, tiada dakwaan melampau.`]] },
+      { tool: "cap", title: "Susun dan edit di CapCut", list: ["Susun klip: Hook, Detail, Demo, Bukti, CTA.", "Masukkan voice over, teks pendek dan muzik.", "Babak CTA: letak harga dan pautan produk di ruang kosong.", "Ikut syarat iklan platform."] },
+      captionStep(P)
+    ]
+  };
+}
+
+function buildAsmr(P) {
+  const K = KAT[P.kat];
+  const panels = ASMR_PANEL.map(([l, en], i) => [`Panel ${i + 1} · ${l}`, `${K.asmr}\n${productLines(P, false)}\nShot: ${en}.\nAudio: real, detailed, close-up ASMR sound. No music, no voiceover.`]);
+  return {
+    timeline: ASMR_PANEL.map(([l], i) => [`${i + 1} · ${l}`, "panel", i === 0 ? "hook" : i === 5 ? "cta" : ""]),
+    steps: [
+      { tool: "gpt", title: "Buka ChatGPT dan muat naik foto produk", text: "Mulakan chat baru dengan foto produk yang jelas." },
+      { tool: "gpt", title: "Jana storyboard ASMR 6 panel", text: "Hasilnya 6 panel: makro tekstur, tangan, aksi utama, super makro, slow motion dan hero shot.", prompts: [["Prompt storyboard ASMR", `/adcreative/storyboard/6panel/ASMR cinematic commercial/extreme macro detail/slow motion/satisfying action/realistic texture/natural lighting/close-up hands/product hero shot/immersive sound design/no music/no voiceover/vertical 9:16\n\n${productLines(P)}`]] },
+      { tool: "flow", title: "Jana video setiap panel di Google Flow", text: "Muat naik storyboard sebagai rujukan, kemudian generate satu panel pada satu masa.", prompts: panels },
+      { tool: "cap", title: "Kemas di CapCut", list: ["Cantum 6 klip mengikut turutan panel.", "Tiada muzik dan tiada narasi. Biar bunyi ASMR yang menonjol.", "Gerakan perlahan dan halus. Akhiri dengan hero shot.", "Teks CTA kecil sahaja di hujung."] },
+      captionStep(P)
+    ]
+  };
+}
+
+const BUILDERS = { pantas: buildPantas, premium: buildPremium, lima: buildLima, asmr: buildAsmr };
+
+/* ---------- Render ---------- */
+let uid = 0;
+function promptBlock(label, text) {
+  const id = "p" + (++uid);
+  return `<div class="prompt"><div class="prompt-head"><span>${esc(label)}</span><button type="button" class="copy" data-copy="${id}">Salin</button></div><pre id="${id}">${esc(text)}</pre></div>`;
+}
+function checklist(P) {
+  const items = [
+    "Bentuk, warna, logo dan label sama dengan produk asli",
+    "Tiada teks atau logo herot pada bungkusan",
+    "Tangan, muka dan jari model kelihatan normal",
+    "Nisbah 9:16 dan produk jelas di skrin telefon",
+    "Satu palet warna di semua babak",
+    "Tiada janji hasil yang tidak realistik" + (P.kat === "kosmetik" || P.kat === "skincare" ? " (penting untuk kosmetik dan skincare)" : ""),
+    "Pautan produk dan syarat iklan platform dipenuhi"
+  ];
+  return `<div class="check"><h3>Semak sebelum muat naik</h3>${items.map((t, i) => `<label><input type="checkbox" id="semak-${i}"> ${esc(t)}</label>`).join("")}</div>`;
+}
+function render() {
+  const P = readForm();
+  store.set(P);
+  setLatarList(P.kat);
+  const K = KAT[P.kat], A = ALIRAN[P.aliran];
+  const R = BUILDERS[P.aliran](P);
+  uid = 0;
+  const flowNote = P.aliran === "pantas" || P.aliran === "premium"
+    ? ` Kombinasi Flow untuk babak isi: <b>${esc(FLOW[K.flow][0])}</b>.` : "";
+  $("#output").innerHTML = `
+    <div class="brief">
+      <span class="eyebrow">${esc(A.label)} · ${esc(K.label)} · sumber: ${esc(A.sumber)}</span>
+      <h2>${esc(nm(P))}</h2>
+      <div class="timeline" aria-label="Susunan babak">${R.timeline.map(([l, t, c]) => `<div class="seg ${c}" style="flex:1 1 0"><b title="${esc(l)}">${esc(l)}</b><span>${esc(t)}</span></div>`).join("")}</div>
+      <div class="why"><b>Kenapa kod ini?</b> ${esc(K.nota)}${flowNote}</div>
+    </div>
+    <ol class="steps">${R.steps.map(s => `
+      <li class="step"><div class="step-body">
+        <div class="step-head"><span class="tool ${s.tool}">${esc(s.toolLabel || { gpt: "ChatGPT", flow: "Google Flow", cap: "CapCut", tt: "TikTok" }[s.tool])}</span><h3>${esc(s.title)}</h3></div>
+        ${s.text ? `<p>${esc(s.text)}</p>` : ""}
+        ${s.list ? `<ul>${s.list.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+        ${(s.prompts || []).map(([l, t]) => promptBlock(l, t)).join("")}
+        ${s.tip ? `<p class="tip">${s.tip}</p>` : ""}
+      </div></li>`).join("")}
+    </ol>
+    ${checklist(P)}`;
+}
+
+/* ---------- Salin ---------- */
+const toast = $("#toast");
+let toastT;
+function showToast(msg) { toast.textContent = msg; toast.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => toast.hidden = true, 1400); }
+function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+function copyText(text, el, btn) {
+  const ok = () => { showToast("Disalin"); if (btn) { btn.classList.add("done"); const o = btn.textContent; btn.textContent = "Disalin"; setTimeout(() => { btn.classList.remove("done"); btn.textContent = o; }, 1300); } };
+  const fail = () => { if (el) selectText(el); showToast("Teks dipilih. Tekan Ctrl+C / salin"); };
+  try { navigator.clipboard.writeText(text).then(ok, fail); } catch (e) { fail(); }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]");
+  if (b) { const pre = document.getElementById(b.dataset.copy); copyText(pre.textContent, pre, b); return; }
+  const c = e.target.closest("[data-code]");
+  if (c) copyText(c.dataset.code, c, null);
+});
+
+/* ---------- Tab ---------- */
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  ["studio", "kamus", "bonus"].forEach(v => $("#view-" + v).hidden = v !== b.dataset.tab);
+}));
+
+/* ---------- Kamus ---------- */
+const TAGS = [
+  ["Tag Google Flow", "Untuk prompt video di Google Flow. Guna satu tag bagi setiap kumpulan supaya tidak bertembung.", [
+    ["Kualiti (letak di hujung)", "/ultraphotorealistic /photorealistic /hyperrealistic /8kdetail /ultradetailed /premiumvisual /highendcommercial /realistictexture /accuratematerial /productphotography"],
+    ["Sudut kamera", "/productcloseup /macroshot /extremecloseup /wideangle /lowangle /highangle /topdown /threequarterview /frontview /sideview /backview /dutchangle /overheadshot"],
+    ["Gerakan kamera", "/slowzoom /fastzoom /zoomtransition /pushin /pullout /dollyin /dollyout /orbitcamera /360orbit /arcshot /trackingshot /craneup /cranedown /parallax"],
+    ["Kesan produk", "/floatingad /floatingproduct /productlevitation /zeroGravity /suspendedproduct /heroProduct /productReveal /productShowcase /productReveal360 /premiumproductshot /luxurycommercial /cinematiccommercial"],
+    ["Kesan dramatik", "/explosivereveal /particleburst /smokeReveal /lightburst /energyReveal /magicReveal /glowReveal /splashReveal /dustParticles /sparkParticles /lightParticles /volumetricSmoke"],
+    ["Pencahayaan", "/studiolighting /cinematiclighting /dramaticlighting /softlighting /hardlighting /rimlighting /backlighting /sideLighting /topLighting /neonlighting /volumetriclighting /goldenhour /softboxlighting /threepointlighting"],
+    ["Premium", "/luxuryadvertising /premiumcommercial /highendadvertising /luxurystudio /minimaliststudio /premiumbackground /elegantcomposition /editorialproductshot /appleStyleCommercial /brandHeroShot"],
+    ["Transisi", "/morphtransition /matchcut /whiptransition /spintransition /zoomtransition /flashtransition /lighttransition /smoothtransition /seamlesstransition /objecttransition /cameratransition /parallaxtransition"],
+    ["Pergerakan", "/smoothmotion /cinematicmotion /dynamicmotion /slowmotion /superSlowMotion /fastmotion /realisticPhysics /naturalMovement /preciseMotion /fluidMotion /controlledMotion"],
+    ["TikTok / Reels", "/vertical9x16 /socialmediaad /tiktokcommercial /viralproductvideo /attentiongrabbing /stronghook /fastpaced /dynamicframing /scrollstopper /heroShot /ctaEnding"]
+  ]],
+  ["Camera direction", "Untuk video bergaya filem. Guna 1–2 gerakan kamera sahaja bagi setiap klip.", [
+    ["Gerakan kamera", "FPV Flythrough along the street|FPV Flythrough through the city|Drone Flyover|Drone Top Down Shot|Drone Orbit Shot|Aerial Tracking Shot|Low Angle Tracking Shot|High Angle Shot|Side Tracking Shot|Front Tracking Shot|Rear Tracking Shot|Camera Push In|Camera Pull Out|Slow Push In|Slow Pull Out|Dolly In|Dolly Out|Tracking Shot|Handheld Tracking|Steadicam Follow Shot|Orbit Camera 360°|Camera Arc Around Subject|Camera Crane Up|Camera Crane Down"],
+    ["Saiz & sudut shot", "Cinematic Wide Shot|Extreme Wide Shot|Medium Shot|Medium Close Up|Close Up|Extreme Close Up|Macro Product Shot|Detail Shot|Over The Shoulder Shot|POV Shot|First Person POV|Low Angle Cinematic|Dutch Angle|Symmetrical Composition|Centered Composition|Rule of Thirds|Foreground Framing|Deep Focus|Shallow Depth of Field|Bokeh Background"],
+    ["Aksi dinamik", "Dynamic Motion|Slow Motion|Speed Ramp|Freeze Frame Moment|Whip Pan Transition|Quick Camera Pan|Fast Push In|Camera Shake|Impact Camera Shake|360° Spin Shot|Running Tracking Shot|Walking Tracking Shot|Jump Cut Action|Follow The Action|Reveal Through Motion|Action Freeze"],
+    ["Fashion / produk", "Model Walks Toward Camera|Model Walks Through The City|Model Runs Through The Street|Model Turns Toward Camera|Model Product Reveal|Product Hero Shot|Product Close Up|Macro Product Detail|Product Rotation 360°|Product Floating Shot|Product Reveal From Shadow|Product In Motion|Material Detail Shot|Logo Detail Shot|Texture Macro Shot|Hands Holding Product|Model Wearing Product"],
+    ["Cahaya & suasana", "Golden Hour Sunlight|Sunlight Flare|Lens Flare|Rim Lighting|Backlight|Soft Cinematic Lighting|Dramatic Lighting|High Contrast Lighting|Natural Daylight|Sunset Lighting|Volumetric Light|Light Rays|Neon City Lights|Wet Street Reflection|Shadow Play"],
+    ["Drone / udara", "FPV Street Flythrough|FPV Chase Shot|FPV Follow The Model|Drone Follow Shot|Drone Reveal Shot|Drone Orbit 360°|Drone Pull Back Reveal|Drone Push Forward|Top Down City Shot|Aerial Establishing Shot|Drone Descending Shot|Drone Rising Shot|Low Altitude FPV|High Altitude Aerial"],
+    ["Transisi", "Whip Pan Transition|Object Wipe Transition|Match Cut|Seamless Transition|Speed Ramp Transition|Camera Spin Transition|Zoom Transition|Light Flash Transition|Motion Blur Transition|Foreground Transition|Parallax Transition|Push Through Transition"],
+    ["Rupa iklan premium", "Premium Commercial|Luxury Advertisement|Cinematic Commercial|Ultra Photorealistic|High End Fashion Film|Editorial Fashion Style|Commercial Product Film|8K Detail|Photorealistic|Cinematic Depth|Film Grain|Professional Color Grading|High Dynamic Range|Realistic Physics|Sharp Product Detail"]
+  ]]
+];
+function renderKamus(q = "") {
+  q = q.toLowerCase();
+  const match = (...s) => !q || s.join(" ").toLowerCase().includes(q);
+  const groups = {};
+  Object.entries(CMD).forEach(([k, v]) => { if (match(k, v[0], v[1], v[2], v[3])) (groups[v[0]] = groups[v[0]] || []).push([k, v]); });
+  let html = "";
+  const gk = Object.keys(groups);
+  if (gk.length) {
+    html += `<div class="dict-group"><h3>Kod gambar (34 kod)</h3><p>Untuk prompt gambar di ChatGPT atau Leonardo.Ai. Tekan kad untuk salin prompt penuh.</p>`;
+    gk.forEach(g => {
+      html += `<div class="cmds">${groups[g].map(([k, v]) => `<button type="button" class="cmd" data-code="/${k} [produk] ${esc(v[3])}"><code>/${k}</code><span>${esc(v[1])}</span><small>${esc(g)} · ${esc(v[2])}</small></button>`).join("")}</div>`;
+    });
+    html += `</div>`;
+  }
+  TAGS.forEach(([title, sub, rows], ti) => {
+    const sep = ti === 0 ? " " : "|";
+    const filtered = rows.map(([l, s]) => [l, s.split(sep).filter(Boolean).filter(t => match(t, l))]).filter(([, a]) => a.length);
+    if (!filtered.length) return;
+    html += `<div class="dict-group"><h3>${esc(title)}</h3><p>${esc(sub)}</p>${filtered.map(([l, a]) => `<div><b>${esc(l)}</b><div class="tags" style="margin-top:6px">${a.map(t => { const v = ti === 0 ? t : "/" + t; return `<button type="button" class="tag" data-code="${esc(v)}">${esc(v)}</button>`; }).join("")}</div></div>`).join("")}</div>`;
+  });
+  $("#kamus").innerHTML = html || `<p class="hint">Tiada kod yang sepadan dengan "${esc(q)}".</p>`;
+}
+$("#cari").addEventListener("input", e => renderKamus(e.target.value.trim()));
+
+/* ---------- Bonus ---------- */
+const BONUS = [
+  { t: "Bina tool generator sendiri di Gemini", s: "ChatGPT tulis prompt, Gemini Canvas jadikan app storyboard.", body: [
+    ["p", "1. Buka ChatGPT dan tampal prompt di bawah. Tukar nama tool jika mahu."],
+    ["prompt", "Prompt ChatGPT", "Buatkan prompt untuk membina tool generator di Gemini, untuk menjana gambar bagi tujuan afiliat. Lengkap dengan analisis produk, pemilihan model, dan naratif yang sesuai dengan jenis produk (hook, problem-solve dan CTA). Nama tool generator: AI Affiliate Storyboard Generator"],
+    ["p", "2. Salin semua prompt yang ChatGPT hasilkan. 3. Buka Gemini, hidupkan mod Canvas, kemudian tampal. Gemini akan bina app dengan ciri ini:"],
+    ["ul", ["Product Analyzer: analisis gambar JPG/PNG/WEBP (jenama, warna, bentuk, bahan, bungkusan).", "Tempoh 15 / 20 / 30 / 45 / 60 saat, gaya TikTok Affiliate, UGC atau Cinematic.", "Master Lock supaya watak dan produk sama dalam setiap babak.", "Visual 9:16 dengan butang Generate, Regenerate, Edit Prompt dan Generate All.", "Prompt video untuk Veo, Kling dan Runway.", "Narasi, kapsyen TikTok, CTA beg kuning, eksport PDF / TXT / JSON."]],
+    ["p", "Struktur storyboard yang diikut: Hook, Problem, Solution, Demonstration, Benefit, CTA."]
+  ]},
+  { t: "Animasi gaya Disney Pixar", s: "3 prompt: idea cerita, master karakter, prompt setiap babak.", body: [
+    ["prompt", "Prompt 1 · Idea cerita", "Kamu adalah seorang animator handal. Berikan 5 idea buku cerita tentang [tema pilihan] dengan gaya kartun 3D ala Disney Pixar yang realistik."],
+    ["prompt", "Prompt 2 · Master karakter", "Buatkan prompt master karakter [penerangan karakter yang diingini] secara terperinci, sempurna dan konsisten dalam semua babak, dengan gaya kartun 3D ala Disney yang realistik."],
+    ["prompt", "Prompt 3 · Setiap babak", "Kembangkan idea nombor [..] menjadi kandungan pendidikan untuk [..] babak. Buatkan visualnya dalam bentuk prompt text-to-image dan image-to-video bergaya kartun 3D ala Disney Pixar yang realistik, dengan master prompt karakter. Prompt wajib ikut arahan visual dan narasi setiap babak, setiap satu berdurasi 6 saat."],
+    ["p", "Setiap prompt babak mesti ada: master karakter di awal, pakaian karakter, objek, subjek, tempat, pencahayaan, suasana dan bunyi, serta sudut kamera. Satu babak untuk satu aksi sahaja. Jangan ubah penerangan karakter di tengah jalan."]
+  ]},
+  { t: "Animasi claymation", s: "Topik, skrip storytelling, prompt visual gaya tanah liat.", body: [
+    ["prompt", "Langkah 1 · 5 topik", "BUATKAN 5 TOPIK KANDUNGAN TENTANG (...isi yang anda mahu...) YANG JARANG ORANG TAHU, YANG SESUAI DIBINCANGKAN DENGAN GAYA CLAY ANIMATION."],
+    ["prompt", "Langkah 2 · Skrip", "Topik: (tajuk pilihan anda)\nBUATKAN SKRIP VIDEO TIKTOK/SHORT BERGAYA STORYTELLING PENDIDIKAN, DENGAN GAYA CLAY ANIMATION. GUNAKAN BAHASA RINGAN DAN SOPAN DENGAN VISUAL YANG TERPERINCI.\n\nStruktur: 1. Hook 2. Pengenalan topik 3. Penjelasan 1: asal usul / fakta asas 4. Penjelasan 2: fakta paling menarik 5. Fakta unik / sisi lain 6. Pendidikan 7. Ajakan bertindak\n\nSertakan arahan visual untuk setiap ayat."],
+    ["prompt", "Langkah 3 · Master prompt (letak di awal setiap prompt gambar)", "soft 3D clay animation, handcrafted texture, vibrant full-color palette, crowded and dramatic scene. Proportional human characters with expressive faces, smooth clay details with subtle fingerprint. Busy and colorful environment, modern cinematic lighting with soft contrast and depth of field. Dynamic atmosphere, high-quality visual style."],
+    ["p", "Minta ChatGPT buat 2 visual bagi setiap bahagian skrip, maksimum 800 aksara setiap prompt. Hantar prompt satu demi satu. Kesan tambahan: kilauan lembut, neon lembut, partikel cahaya, sparkle, palet warna terang."]
+  ]},
+  { t: "Video tutorial asal", s: "Pautan YouTube dari folder modul.", body: [
+    ["links", [["Tutorial iklan 30 saat (ChatGPT + Flow)", "https://youtu.be/T5q5hD-Zybo"], ["Materi kelas: membuat video", "https://youtu.be/bddTnosYAf8"]]]
+  ]}
+];
+function renderBonus() {
+  let n = 0;
+  $("#bonus").innerHTML = BONUS.map((b, i) => `<details class="card"${i === 0 ? " open" : ""}><summary>${esc(b.t)}<small>${esc(b.s)}</small></summary><div class="inner">${b.body.map(x => {
+    if (x[0] === "p") return `<p>${esc(x[1])}</p>`;
+    if (x[0] === "ul") return `<ul>${x[1].map(li => `<li>${esc(li)}</li>`).join("")}</ul>`;
+    if (x[0] === "links") return `<div class="links">${x[1].map(([l, h]) => `<a href="${h}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join("")}</div>`;
+    const id = "b" + (++n);
+    return `<div class="prompt"><div class="prompt-head"><span>${esc(x[1])}</span><button type="button" class="copy" data-copy="${id}">Salin</button></div><pre id="${id}">${esc(x[2])}</pre></div>`;
+  }).join("")}</div></details>`).join("");
+}
+
+/* ---------- Mula ---------- */
+const saved = store.get();
+const sample = Object.assign({ kat: "minuman", aliran: "pantas", model: false }, KAT.minuman.contoh);
+writeForm(saved || sample);
+$("#contoh-bar").hidden = !!(saved && saved.edited);
+let edited = !!(saved && saved.edited);
+
+$("#borang").addEventListener("input", e => {
+  if (e.target.name === "kat" && !edited) {
+    // Masih contoh: tukar contoh ikut kategori supaya pratonton masuk akal
+    const k = e.target.value;
+    writeForm(Object.assign({}, readForm(), KAT[k].contoh, { kat: k }));
+  } else if (e.target.type === "text" || e.target.tagName === "TEXTAREA") {
+    edited = true; $("#contoh-bar").hidden = true;
+  }
+  render();
+  const P = readForm(); P.edited = edited; store.set(P);
+});
+$("#borang").addEventListener("submit", e => e.preventDefault());
+$("#kosongkan").addEventListener("click", () => {
+  const P = readForm();
+  FIELDS.forEach(f => P[f] = "");
+  writeForm(P); edited = true; $("#contoh-bar").hidden = true;
+  render(); P.edited = true; store.set(P);
+  $("#f-nama").focus();
+});
+
+render();
+const P0 = readForm(); P0.edited = edited; store.set(P0);
+renderKamus();
+renderBonus();
+})();
+</script>
+</body>
+</html>
